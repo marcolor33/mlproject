@@ -16,7 +16,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
 # Loading data
 script_path = os.path.dirname(__file__)
-relative_path = ".data\Video_Games_Sales_as_at_22_Dec_2016.csv"
+relative_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
 absolute_path = os.path.join(script_path, relative_path)
 
 # Read csv
@@ -40,9 +40,13 @@ df4 = df3.drop(drop_column, 1)
 print(df4.head())
 print(df4.shape)
 scaler = StandardScaler()
-df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
-# df4[['Critic_Score', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'Global_Sales']])
-# df4 = pd.DataFrame(df4)
+# df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
+
+
+df4[['Critic_Score']] = scaler.fit_transform(df4[['Critic_Score']])
+
+
+
 print(df4.head())
 
 # Predict the global sales
