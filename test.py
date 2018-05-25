@@ -1,72 +1,118 @@
-from __future__ import division
-#
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.svm import SVR
+from sklearn.utils import shuffle
 import numpy as np
-import json
 import pandas as pd
-from IPython.display import display, HTML
-from sklearn.linear_model import LogisticRegression
+import os
 
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.tree import DecisionTreeClassifier,DecisionTreeRegressor
+# Loading data
+script_path = os.path.dirname(__file__)
+relative_path = "data.csv"
+absolute_path = os.path.join(script_path, relative_path)
 
-# classifier = LogisticRegression()
-
-classifier = DecisionTreeRegressor()
-
-# enc = OneHotEncoder(categorical_features=[0,2,3,8,9])
-
-def train():
-
-    csv_path = "data.csv"
-
-
-    # read data from csv
-    df = pd.read_csv(csv_path)
-
-
-    # remove row that have no value
-    df = df.dropna()
-    df = df.sample(frac=1).reset_index(drop=True)
-
-
-    print(df.shape)
-
-
-    y_train = df['Global_Sales'].values[:6000]
-    y_test = df['Global_Sales'].values[6000:]
-
-
-    # remove name and sales
-    df = df.drop(columns=['Name', 'NA_Sales', 'EU_Sales','JP_Sales','Other_Sales','Global_Sales'])
+# Read csv
+df = pd.read_csv(absolute_path)
+print(df.head())
+print("\n\n\n")
+# Use LabelEncoder to change category into number
+# Then use OneHotEncoder(For non-string)/get_dummies(For string) to add column to the dataframe
 
 
 
-    # method 2
-    # transform the string feature into many binary features
-    cols_to_transform = [ 'Platform', 'Genre', 'Publisher', 'Developer','Rating']
-    expanded_df = pd.get_dummies(df, columns=cols_to_transform , prefix=cols_to_transform)
+# 1. drop feature
+drop_column = ['Name', 'User_Score', 'User_Count','Rating']
+df2 = df.drop(drop_column, 1)
 
 
-    x_train = expanded_df.values[:6000]
-    x_test = expanded_df.values[6000:]
-
-    classifier.fit(x_train,y_train)
-    prediction = classifier.predict(x_test)
-
-    print(prediction)
-
-    print("-----------------")
-
-    print(y_test)
-
-    print("-----------------")
-
-    error = np.true_divide(np.absolute(prediction - y_test),y_test) * 100
-    print(error)
+# 2. remove row with empty cirtic score
+df2 = df2[(df2.Critic_Score.notnull())]
+print("df2")
+print(df2.head())
 
 
+# 3. shuffle the data set
+df2 = shuffle(df2)
 
 
+# 4. expand using dummy coding
+df3 = pd.get_dummies(df2, columns=['Platform', 'Genre', 'Publisher', 'Developer'])
 
+print("df3")
+print(df3.head())
 
-train()
+# Drop row which has no critic score (NaN)
+
+# 5. standardization the numerical feature
+scaler = StandardScaler()
+df3[['Year_of_Release','Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df3[['Year_of_Release','Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
+print("final df")
+print(df3.head())
+
+# dividing test set and training set
+y = df3['Global_Sales']
+X = df3.drop(['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales'], 1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
+
+print(X_train)
+# Model 1: LinearRegression
+regr = LinearRegression()
+regr.fit(X_train, y_train)
+# r2_score,
+print(regr.score(X_test, y_test))
+y_predict = regr.predict(X_test)
+print(r2_score(y_test, y_predict))
+print(mean_absolute_error(y_test, y_predict))
+
+# Model 2: Decision tree (Much better)
+# Testing max_depth, around 6-8 will be the best
+'''
+for i in range(3, 100):
+    regr_1 = DecisionTreeRegressor(max_depth=i)
+    regr_1.fit(X_train, y_train)
+    y_predict_1 = regr_1.predict(X_test)
+    print("Decision tree with depth" + str(i))
+    print(r2_score(y_test, y_predict_1))
+    print(mean_absolute_error(y_test, y_predict_1))
+'''
+regr_1 = DecisionTreeRegressor(max_depth=6)
+regr_1.fit(X_train, y_train)
+y_predict_1 = regr_1.predict(X_test)
+print("Decision tree with depth 6")
+print(r2_score(y_test, y_predict_1))
+print(mean_absolute_error(y_test, y_predict_1))
+'''
+# Model 3: Adaboost (Time-consuming)
+rng = np.random.RandomState(1)
+regr_2 = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4),
+                          n_estimators=50, random_state=rng)
+regr_2.fit(X_train, y_train)
+y_predict_2 = regr_2.predict(X_test)
+print("Decision tree with depth 4")
+print(r2_score(y_test, y_predict_2))
+print(mean_absolute_error(y_test, y_predict_2))
+
+# Model 4: SVM (Time-consuming) (Best: Poly)
+svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
+svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
+y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
+print("RBF Kernel")
+print(r2_score(y_test, y_rbf))
+print(mean_absolute_error(y_test, y_rbf))
+print("Poly Kernel")
+print(r2_score(y_test, y_poly))
+print(mean_absolute_error(y_test, y_poly))
+'''
+
+# Model 5: SGDRegressor
+clf = SGDRegressor()
+clf.fit(X_train, y_train)
+y_predict_sgd = clf.predict(X_test)
+print("SGDRegressor")
+print(r2_score(y_test, y_predict_sgd))
+print(mean_absolute_error(y_test, y_predict_sgd))
