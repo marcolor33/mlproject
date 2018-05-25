@@ -26,31 +26,29 @@ absolute_path = os.path.join(script_path, relative_path)
 
 # Read csv
 df = pd.read_csv(absolute_path)
-print(df.head())
+# print(df.head())
 print("\n\n\n")
 # Use LabelEncoder to change category into number
 # Then use OneHotEncoder(For non-string)/get_dummies(For string) to add column to the dataframe
 # Test using platform column
 df2 = pd.get_dummies(df, columns=['Platform', 'Genre', 'Publisher', 'Developer'])
 # df2 = df
-print(df2.head())
+# print(df2.head())
 
 # Drop row which has no critic score (NaN)
 df3 = df2[(df2.Critic_Score.notnull())]
-print(df3.head())
+# print(df3.head())
 
 df3 = shuffle(df3)
 drop_column = ['Name', 'Year_of_Release', 'User_Score', 'User_Count']
 df4 = df3.drop(drop_column, 1)
-print(df4.head())
-print(df4.shape)
+# print(df4.head())
+# print(df4.shape)
 feature_scaler = StandardScaler()
 df4[['Critic_Score']] = feature_scaler.fit_transform(df4[['Critic_Score']])
 
 
-
-
-print(df4.head())
+# print(df4.head())
 
 # Predict the global sales
 
