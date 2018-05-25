@@ -3,16 +3,21 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
-from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.metrics import r2_score, mean_absolute_error, median_absolute_error
 from sklearn.svm import SVR
 from sklearn.utils import shuffle
 import numpy as np
 import pandas as pd
 import os
+import statistics
 
 def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+def median_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = statistics.median(y_true), statistics.median(y_pred)
+    return abs((y_true - y_pred) / y_true) * 100
 
 # Loading data
 script_path = os.path.dirname(__file__)
@@ -62,7 +67,9 @@ print(regr.score(X_test, y_test))
 y_predict = regr.predict(X_test)
 print(r2_score(y_test, y_predict))
 print(mean_absolute_error(y_test, y_predict))
+print(median_absolute_error(y_test, y_predict))
 print(mean_absolute_percentage_error(y_test, y_predict))
+print(median_absolute_percentage_error(y_test, y_predict))
 # Model 2: Decision tree (Much better)
 # Testing max_depth, around 6-8 will be the best
 '''
@@ -81,7 +88,9 @@ y_predict_1 = regr_1.predict(X_test)
 print("Decision tree with depth 6")
 print(r2_score(y_test, y_predict_1))
 print(mean_absolute_error(y_test, y_predict_1))
+print(median_absolute_error(y_test, y_predict_1))
 print(mean_absolute_percentage_error(y_test, y_predict_1))
+print(median_absolute_percentage_error(y_test, y_predict_1))
 '''
 # Model 3: Adaboost (Time-consuming)
 rng = np.random.RandomState(1)
@@ -102,11 +111,15 @@ y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
 print("RBF Kernel")
 print(r2_score(y_test, y_rbf))
 print(mean_absolute_error(y_test, y_rbf))
+print(median_absolute_error(y_test, y_rbf))
 print(mean_absolute_percentage_error(y_test, y_rbf))
+print(median_absolute_percentage_error(y_test, y_rbf))
 print("Poly Kernel")
 print(r2_score(y_test, y_poly))
 print(mean_absolute_error(y_test, y_poly))
+print(median_absolute_error(y_test, y_poly))
 print(mean_absolute_percentage_error(y_test, y_poly))
+print(median_absolute_percentage_error(y_test, y_poly))
 
 # Model 5: SGDRegressor
 clf = SGDRegressor()
@@ -115,4 +128,6 @@ y_predict_sgd = clf.predict(X_test)
 print("SGDRegressor")
 print(r2_score(y_test, y_predict_sgd))
 print(mean_absolute_error(y_test, y_predict_sgd))
+print(median_absolute_error(y_test, y_predict_sgd))
 print(mean_absolute_percentage_error(y_test, y_predict_sgd))
+print(median_absolute_percentage_error(y_test, y_predict_sgd))
