@@ -66,12 +66,10 @@ for region in region_list:
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
 
+    svr_poly = SVR(kernel='poly', C=1e3, degree=2)
+    svr_poly.fit(X_train, y_train)
 
-    regr_1 = DecisionTreeRegressor(max_depth=10)
-    regr_1.fit(X_train, y_train)
-
-    #
-    predict = regr_1.predict((X_test.values[0]).reshape(1,-1))
+    predict = svr_poly.predict((X_test.values[0]).reshape(1,-1))
 
     print("Prediction of "+region+ " : " + str(y_scaler.inverse_transform(predict)))
     print("Actual of "+region+ " : " + str(y_scaler.inverse_transform(y_test.values[0].reshape(1,-1))))
