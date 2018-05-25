@@ -21,7 +21,7 @@ def median_absolute_percentage_error(y_true, y_pred):
 
 # Loading data
 script_path = os.path.dirname(__file__)
-relative_path = ".data\Video_Games_Sales_as_at_22_Dec_2016.csv"
+relative_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
 absolute_path = os.path.join(script_path, relative_path)
 
 # Read csv
@@ -46,8 +46,7 @@ print(df4.head())
 print(df4.shape)
 scaler = StandardScaler()
 df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
-# df4[['Critic_Score', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'Global_Sales']])
-# df4 = pd.DataFrame(df4)
+
 print(df4.head())
 
 # Predict the global sales
@@ -99,6 +98,7 @@ print(r2_score(y_test, y_predict_2))
 print(mean_absolute_error(y_test, y_predict_2))
 print(mean_absolute_percentage_error(y_test, y_predict_2))
 '''
+
 # Model 4: SVM (Time-consuming) (Best: Poly)
 svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
 svr_poly = SVR(kernel='poly', C=1e3, degree=2)
