@@ -14,14 +14,15 @@ def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
-
-
-
+def median_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = statistics.median(y_true), statistics.median(y_pred)
+    return abs((y_true - y_pred) / y_true) * 100
 
 # Loading data
 script_path = os.path.dirname(__file__)
 relative_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
 absolute_path = os.path.join(script_path, relative_path)
+
 
 # Read csv
 df = pd.read_csv(absolute_path)
@@ -43,22 +44,24 @@ drop_column = ['Name', 'Year_of_Release', 'User_Score', 'User_Count']
 df4 = df3.drop(drop_column, 1)
 print(df4.head())
 print(df4.shape)
-scaler = StandardScaler()
-df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
+feature_scaler = StandardScaler()
+df4[['Critic_Score']] = feature_scaler.fit_transform(df4[['Critic_Score']])
 
 
-# df4[['Critic_Score', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'Global_Sales']])
-# df4 = pd.DataFrame(df4)
+
+
 print(df4.head())
 
 # Predict the global sales
 
 
-
-
 region_list = ['NA_Sales','EU_Sales','JP_Sales','Other_Sales']
 
 for region in region_list:
+
+    y_scaler = StandardScaler()
+    y_scaler.fit(df4[[region]])
+    df4[[region]] = y_scaler.transform(df4[[region]])
 
     y = df4[region]
     X = df4.drop(['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales', 'Rating'], 1)
@@ -69,31 +72,8 @@ for region in region_list:
     regr_1 = DecisionTreeRegressor(max_depth=10)
     regr_1.fit(X_train, y_train)
 
-
-    # y_predict_1 = regr_1.predict(X_test)
-    # print(X_test.values[0])
-
-    print((X_test.values[0]).reshape(1,-1))
     #
     predict = regr_1.predict((X_test.values[0]).reshape(1,-1))
 
-    print("Prediction of "+region+ " : " + str(scaler.inverse_transform(predict)))
-    print("Actual of "+region+ " : " + str(y_test.values[0]))
-
-    # print("Decision tree with depth 6")
-    # print(r2_score(y_test, y_predict_1))
-    # print(mean_absolute_error(y_test, y_predict_1))
-    # print(mean_absolute_percentage_error(y_test, y_predict_1))
-    #
-    # svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
-    # svr_poly = SVR(kernel='poly', degree=2)
-    # y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
-    # y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
-    # print("RBF Kernel")
-    # print(r2_score(y_test, y_rbf))
-    # print(mean_absolute_error(y_test, y_rbf))
-    # print(mean_absolute_percentage_error(y_test, y_rbf))
-    # print("Poly Kernel")
-    # print(r2_score(y_test, y_poly))
-    # print(mean_absolute_error(y_test, y_poly))
-    # print(mean_absolute_percentage_error(y_test, y_poly))
+    print("Prediction of "+region+ " : " + str(y_scaler.inverse_transform(predict)))
+    print("Actual of "+region+ " : " + str(y_scaler.inverse_transform(y_test.values[0].reshape(1,-1))))

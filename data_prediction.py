@@ -45,12 +45,7 @@ df4 = df3.drop(drop_column, 1)
 print(df4.head())
 print(df4.shape)
 scaler = StandardScaler()
-# df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
-
-
-df4[['Critic_Score']] = scaler.fit_transform(df4[['Critic_Score']])
-
-
+df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
 
 print(df4.head())
 
