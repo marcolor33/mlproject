@@ -8,3 +8,4 @@ This project is based on the database from Kaggle. The link of the database: htt
 |File name |Usage |
 |--|--|
 |data_prediction |Predict Global Sales of the game |
+|genre_prediction   |Predict Game Genre   |
