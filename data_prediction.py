@@ -20,34 +20,34 @@ def median_absolute_percentage_error(y_true, y_pred):
     return abs((y_true - y_pred) / y_true) * 100
 
 # Loading data
-script_path = os.path.dirname(__file__)
-relative_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
-absolute_path = os.path.join(script_path, relative_path)
+csv_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
 
 # Read csv
-df = pd.read_csv(absolute_path)
-print(df.head())
-print("\n\n\n")
-# Use LabelEncoder to change category into number
-# Then use OneHotEncoder(For non-string)/get_dummies(For string) to add column to the dataframe
-# Test using platform column
+df = pd.read_csv(csv_path)
+# print(df.head())
+
+# using dummy coding to expand the features
 df2 = pd.get_dummies(df, columns=['Platform', 'Genre', 'Publisher', 'Developer'])
 # df2 = df
-print(df2.head())
+# print(df2.head())
 
 # Drop row which has no critic score (NaN)
 df3 = df2[(df2.Critic_Score.notnull())]
-print(df3.head())
+# print(df3.head())
 
+
+# shuffle and dropped unused features
 df3 = shuffle(df3)
 drop_column = ['Name', 'Year_of_Release', 'User_Score', 'User_Count']
 df4 = df3.drop(drop_column, 1)
-print(df4.head())
-print(df4.shape)
+# print(df4.head())
+# print(df4.shape)
+
+# standardization of values
 scaler = StandardScaler()
 df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']] = scaler.fit_transform(df4[['Critic_Score', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']])
 
-print(df4.head())
+# print(df4.head())
 
 # Predict the global sales
 y = df4['Global_Sales']
@@ -57,16 +57,16 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
 # Model 1: LinearRegression
 regr = LinearRegression()
 regr.fit(X_train, y_train)
-# r2_score,
-print(regr.score(X_test, y_test))
+# print(regr.score(X_test, y_test))
 y_predict = regr.predict(X_test)
-print(r2_score(y_test, y_predict))
-print(mean_absolute_error(y_test, y_predict))
-print(median_absolute_error(y_test, y_predict))
-print(mean_absolute_percentage_error(y_test, y_predict))
-print(median_absolute_percentage_error(y_test, y_predict))
+print("r2_score :" + str(r2_score(y_test, y_predict)))
+print("mean_absolute_error :" + str(mean_absolute_error(y_test, y_predict)))
+print("median_absolute_error :" + str(median_absolute_error(y_test, y_predict)))
+print("mean_absolute_percentage_error :" + str(mean_absolute_percentage_error(y_test, y_predict)))
+print("median_absolute_percentage_error :" + str(median_absolute_percentage_error(y_test, y_predict)))
 # Model 2: Decision tree (Much better)
 # Testing max_depth, around 6-8 will be the best
+
 '''
 for i in range(3, 100):
     regr_1 = DecisionTreeRegressor(max_depth=i)
@@ -77,15 +77,16 @@ for i in range(3, 100):
     print(mean_absolute_error(y_test, y_predict_1))
     print(mean_absolute_percentage_error(y_test, y_predict_1))
 '''
+
 regr_1 = DecisionTreeRegressor(max_depth=6)
 regr_1.fit(X_train, y_train)
 y_predict_1 = regr_1.predict(X_test)
 print("Decision tree with depth 6")
-print(r2_score(y_test, y_predict_1))
-print(mean_absolute_error(y_test, y_predict_1))
-print(median_absolute_error(y_test, y_predict_1))
-print(mean_absolute_percentage_error(y_test, y_predict_1))
-print(median_absolute_percentage_error(y_test, y_predict_1))
+print("r2_score :" + str(r2_score(y_test, y_predict_1)))
+print("mean_absolute_error :" + str(mean_absolute_error(y_test, y_predict_1)))
+print("median_absolute_error :" + str(median_absolute_error(y_test, y_predict_1)))
+print("mean_absolute_error :" + str(mean_absolute_percentage_error(y_test, y_predict_1)))
+print("median_absolute_percentage_error :" + str(median_absolute_percentage_error(y_test, y_predict_1)))
 '''
 # Model 3: Adaboost (Time-consuming)
 rng = np.random.RandomState(1)
@@ -105,25 +106,25 @@ svr_poly = SVR(kernel='poly', C=1e3, degree=2)
 y_rbf = svr_rbf.fit(X_train, y_train).predict(X_test)
 y_poly = svr_poly.fit(X_train, y_train).predict(X_test)
 print("RBF Kernel")
-print(r2_score(y_test, y_rbf))
-print(mean_absolute_error(y_test, y_rbf))
-print(median_absolute_error(y_test, y_rbf))
-print(mean_absolute_percentage_error(y_test, y_rbf))
-print(median_absolute_percentage_error(y_test, y_rbf))
+print("r2_score :" + str(r2_score(y_test, y_rbf)))
+print("mean mean_absolute_error :" + str(mean_absolute_error(y_test, y_rbf)))
+print("median_absolute_error :" + str(median_absolute_error(y_test, y_rbf)))
+print("mean_absolute_percentage_error :" + str(mean_absolute_percentage_error(y_test, y_rbf)))
+print("median_absolute_percentage_error :" + str(median_absolute_percentage_error(y_test, y_rbf)))
 print("Poly Kernel")
-print(r2_score(y_test, y_poly))
-print(mean_absolute_error(y_test, y_poly))
-print(median_absolute_error(y_test, y_poly))
-print(mean_absolute_percentage_error(y_test, y_poly))
-print(median_absolute_percentage_error(y_test, y_poly))
+print("r2_score :" + str(r2_score(y_test, y_poly)))
+print("mean_absolute_error :" + str(mean_absolute_error(y_test, y_poly)))
+print("median_absolute_error :" + str(median_absolute_error(y_test, y_poly)))
+print("mean_absolute_error :" + str(mean_absolute_percentage_error(y_test, y_poly)))
+print("median_absolute_percentage_error :" + str(median_absolute_percentage_error(y_test, y_poly)))
 
 # Model 5: SGDRegressor
 clf = SGDRegressor()
 clf.fit(X_train, y_train)
 y_predict_sgd = clf.predict(X_test)
 print("SGDRegressor")
-print(r2_score(y_test, y_predict_sgd))
-print(mean_absolute_error(y_test, y_predict_sgd))
-print(median_absolute_error(y_test, y_predict_sgd))
-print(mean_absolute_percentage_error(y_test, y_predict_sgd))
-print(median_absolute_percentage_error(y_test, y_predict_sgd))
+print("r2_score :" + str(r2_score(y_test, y_predict_sgd)))
+print("mean_absolute_error :" + str(mean_absolute_error(y_test, y_predict_sgd)))
+print("median_absolute_error :" + str(median_absolute_error(y_test, y_predict_sgd)))
+print("mean_absolute_error :" + str(mean_absolute_percentage_error(y_test, y_predict_sgd)))
+print("median_absolute_percentage_error :" + str(median_absolute_percentage_error(y_test, y_predict_sgd)))

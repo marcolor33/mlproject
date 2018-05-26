@@ -19,13 +19,11 @@ def median_absolute_percentage_error(y_true, y_pred):
     return abs((y_true - y_pred) / y_true) * 100
 
 # Loading data
-script_path = os.path.dirname(__file__)
-relative_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
-absolute_path = os.path.join(script_path, relative_path)
-
+csv_path = "data\Video_Games_Sales_as_at_22_Dec_2016.csv"
 
 # Read csv
-df = pd.read_csv(absolute_path)
+df = pd.read_csv(csv_path)
+
 # print(df.head())
 print("\n\n\n")
 # Use LabelEncoder to change category into number
@@ -68,8 +66,13 @@ for region in region_list:
 
     svr_poly = SVR(kernel='poly', C=1e3, degree=2)
     svr_poly.fit(X_train, y_train)
-
     predict = svr_poly.predict((X_test.values[0]).reshape(1,-1))
 
-    print("Prediction of "+region+ " : " + str(y_scaler.inverse_transform(predict)))
-    print("Actual of "+region+ " : " + str(y_scaler.inverse_transform(y_test.values[0].reshape(1,-1))))
+    actual = y_scaler.inverse_transform(y_test.values[0].reshape(1,-1))[0][0]
+
+    predict = y_scaler.inverse_transform(predict)[0]
+
+
+    print("Prediction of "+region+ " : " + str(predict))
+    print("Actual of "+region+ " : " + str(actual))
+    # print("error :" + str(np.abs((predict - actual)) * 100 / actual))
